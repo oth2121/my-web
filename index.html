@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Truth or Dare! ($TOD) 💎</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Animate On Scroll (AOS) Library CSS -->
+    <link href="https://unpkg.com/aos@2.3.4/dist/aos.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader">
+            <div class="spinner"></div>
+            <p>Loading $TOD Universe...</p>
+        </div>
+    </div>
+
+    <!-- Global Animated Background Container & Particles -->
+    <div class="background-animation">
+        <div class="particles"></div>
+    </div>
+
+    <!-- Custom Achievement Notification -->
+    <div id="achievementNotification" class="achievement-notification">
+        <img src="" alt="Achievement Icon" class="achievement-icon">
+        <div class="achievement-details">
+            <span class="achievement-title"></span>
+            <span class="achievement-desc"></span>
+        </div>
+    </div>
+
+    <header class="header">
+        <!-- Theme Toggle Button -->
+        <button id="themeToggle" class="theme-toggle-btn">🌙</button>
+
+        <!-- Audio Volume Controls -->
+        <div class="volume-controls-group">
+            <div class="volume-control">
+                <span id="sfxVolumeIcon">🔊</span>
+                <input type="range" id="sfxVolumeSlider" min="0" max="1" step="0.1" value="0.3">
+            </div>
+            <div class="volume-control music-volume-control">
+                <span id="musicVolumeIcon">🎵</span>
+                <input type="range" id="musicVolumeSlider" min="0" max="1" step="0.1" value="0.1">
+            </div>
+        </div>
+
+        <!-- Animated TOD Coin Logo -->
+        <div id="tod-coin-logo" data-aos="zoom-in" data-aos-duration="1000">
+            <span class="coin-text">$TOD</span>
+        </div>
+        <h1 data-aos="fade-up" data-aos-delay="200">Truth or Dare!</h1>
+        <p data-aos="fade-up" data-aos-delay="400">HODL your courage, ape into fun! Get ready for some high-stakes questions and legendary dares.</p>
+
+        <!-- UPDATED: Connect Wallet Button and Status with Coming Soon Badge -->
+        <div class="wallet-status-container" data-aos="fade-up" data-aos-delay="500">
+            <button id="connectWalletBtn" class="btn connect-wallet-btn" disabled>
+                <span>Connect Wallet</span>
+                <span class="coming-soon-badge">Coming Soon!</span>
+            </button>
+            <span id="walletAddressDisplay" class="hidden">Wallet Connected: <span class="connected-address">0x...ABC</span></span>
+        </div>
+    </header>
+
+    <!-- Token Information Section -->
+    <section class="token-info-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="token-details">
+            <h3>$TOD:The Solana Game Changer!</h3>
+            <p><strong>Chain:</strong> Solana (SPL)</p>
+            <p><strong>Ticker:</strong> $TOD</p>
+            <div class="contract-address-display">
+                <span class="label">Contract Address:</span>
+                <span id="contractAddress" class="address" title="Click to copy">Coming Soon!</span>
+                <button class="copy-btn">
+                    📋
+                </button>
+            </div>
+            <p class="disclaimer">Always verify contract addresses before transacting.</p>
+        </div>
+    </section>
+
+    <!-- Live $TOD Price Section -->
+    <section class="info-section price-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="info-card">
+            <h2>💰 Live $TOD Price</h2>
+            <div id="todPriceDisplay" class="price-display">
+                <p>Loading price data...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Game Container -->
+    <main class="game-container" data-aos="zoom-in" data-aos-delay="600" data-aos-offset="150">
+        <h2>Your Next Challenge Awaits!</h2>
+
+        <!-- Player Name Input -->
+        <div id="playerNameInputContainer" class="player-name-input">
+            <label for="playerName">Enter your Ape Name:</label>
+            <input type="text" id="playerName" maxlength="20" placeholder="e.g., MoonShot Mike">
+            <button id="savePlayerNameBtn" class="btn">Save Name</button>
+        </div>
+        <p id="currentPlayerName" class="current-player-name hidden"></p>
+
+        <!-- Current Score & Streak Display -->
+        <div class="score-display">
+            Truths: <span id="truthScore">0</span> | Dares: <span id="dareScore">0</span>
+            <span class="streak-display hidden" id="streakDisplay"> | 🔥 Streak: <span id="currentStreak">0</span> days</span>
+        </div>
+
+        <!-- Category Selector -->
+        <div class="category-selector">
+            <label for="promptCategory">Category:</label>
+            <select id="promptCategory">
+                <option value="general">General Crypto</option>
+                <option value="meme">Meme Coin Culture</option>
+                <option value="solana">Solana Specific</option>
+                <option value="advanced">Advanced DeFi</option>
+            </select>
+        </div>
+
+        <!-- Prompt Display (Truth or Dare Question) -->
+        <div id="promptDisplay" class="prompt-display">
+            Click "Start Game" to begin your crypto adventure!
+        </div>
+
+        <!-- Choice Indicators -->
+        <div class="button-group choice-indicators">
+            <button id="trueBtn" class="btn choice-indicator">True (HODL!) ✅</button>
+            <button id="dareBtn" class="btn choice-indicator">Dare (APES Strong!) 🚀</button>
+        </div>
+
+        <!-- Input Section for User's Answer -->
+        <div id="answerInputContainer" class="answer-input-container hidden">
+            <textarea id="answerTextarea" placeholder="Type your answer or describe your dare here..." maxlength="500"></textarea>
+            <button id="submitAnswerBtn" class="btn" disabled>Submit Answer 💎</button>
+        </div>
+
+        <!-- Display for Submitted Answer -->
+        <div id="submittedAnswerDisplay" class="submitted-answer-display hidden">
+            <h3>Your Response:</h3>
+            <p id="playerAnswer"></p>
+            <p class="reward-message" id="rewardMessage"></p>
+            <!-- Share Buttons -->
+            <div class="share-buttons">
+                <button id="shareXBtn" class="btn share-btn">Share on X 🐦</button>
+                <button id="shareTelegramBtn" class="btn share-btn">Share on Telegram ✈️</button>
+            </div>
+        </div>
+
+        <!-- Game Control Buttons -->
+        <div class="game-controls">
+            <button id="startNextBtn" class="btn btn-new-game">Start Game!</button>
+            <button id="randomPromptBtn" class="btn">Random Prompt!</button>
+            <button id="skipBtn" class="btn skip-btn hidden">Skip (0s cooldown)</button>
+        </div>
+    </main>
+
+    <!-- Daily Quest Section -->
+    <section class="info-section daily-quest-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="info-card">
+            <h2>⭐ Daily Quest ⭐</h2>
+            <div id="dailyQuestDisplay">
+                <p>Loading daily quest...</p>
+            </div>
+            <button id="claimDailyQuestRewardBtn" class="btn hidden" disabled>Claim Reward (0 $TOD)</button>
+        </div>
+    </section>
+
+    <!-- Game Session History -->
+    <section class="info-section session-history-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="info-card">
+            <h2>📜 Your Session Log</h2>
+            <div id="sessionHistoryDisplay" class="session-history-content">
+                <p>Play some truths and dares to see your journey unfold!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section class="info-section achievements-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="info-card">
+            <h2>🏅 Your Achievements</h2>
+            <div id="achievementsDisplay" class="achievements-grid">
+                <!-- Achievements will be loaded here by JS -->
+                <p>No achievements unlocked yet. Get playing!</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="info-section testimonials-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="info-card">
+            <h2>📢 What the Apes Say About $TOD!</h2>
+            <div id="testimonialDisplay" class="testimonial-content">
+                <!-- Testimonials will be injected here by JS -->
+                <p>"This is the best True or Dare game on Solana, hands down!"</p>
+                <span class="author">- Crypto_King_Sol</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Leaderboard Section -->
+    <section class="info-section leaderboard-section" data-aos="fade-left" data-aos-offset="150">
+        <div class="info-card">
+            <h2>🏆 Top HODLers & Daredevils</h2>
+            <div id="leaderboardList" class="leaderboard-list">
+                <p>No scores yet. Be the first to earn your spot!</p>
+            </div>
+            <button id="clearLeaderboardBtn" class="btn clear-btn">Clear Leaderboard</button>
+        </div>
+    </section>
+
+    <!-- Updated: Staking Section with Coming Soon -->
+    <section class="info-section staking-section" data-aos="fade-up" data-aos-offset="150">
+        <div class="info-card coming-soon-card">
+            <div class="coming-soon-overlay">
+                <span class="coming-soon-text">COMING SOON!</span>
+            </div>
+            <h2>🌱 $TOD STAKING</h2>
+            <div class="staking-container staking-preview">
+                <div class="staking-stats">
+                    <div class="staking-stat">
+                        <div class="label">Your Balance</div>
+                        <div id="stakingBalance" class="value">0.00 $TOD</div>
+                    </div>
+                    <div class="staking-stat">
+                        <div class="label">Staked</div>
+                        <div id="stakedAmount" class="value">0.00 $TOD</div>
+                    </div>
+                    <div class="staking-stat">
+                        <div class="label">Pending Rewards</div>
+                        <div id="pendingRewards" class="value">0.00 $TOD</div>
+                    </div>
+                </div>
+
+                <div class="staking-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Stake $TOD</h3>
+                        <div class="apy-display">APY: <span id="currentApy">5,000%</span></div>
+                    </div>
+                    <div class="staking-amount-input-group">
+                        <div class="input-label-row">
+                            <label for="stakeAmount">Amount to Stake</label>
+                            <div class="amount-buttons">
+                                <button id="maxStakeBtn" class="btn-sm">MAX</button>
+                                <button id="halfStakeBtn" class="btn-sm">50%</button>
+                            </div>
+                        </div>
+                        <input type="number" id="stakeAmount" min="0" step="0.000001" placeholder="0.00">
+                        <div class="available-balance">Available: <span id="availableToStake">0.00 $TOD</span></div>
+                    </div>
+                    <button id="stakeBtn" class="btn">Stake Tokens</button>
+
+                    <div class="staking-rewards-estimate">
+                        <h4>Estimated Rewards</h4>
+                        <div>
+                            <span>Daily:</span>
+                            <span id="dailyRewards">0.00 $TOD</span>
+                        </div>
+                        <div>
+                            <span>Weekly:</span>
+                            <span id="weeklyRewards">0.00 $TOD</span>
+                        </div>
+                        <div>
+                            <span>Monthly:</span>
+                            <span id="monthlyRewards">0.00 $TOD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="unstaking-card hidden">
+                    <h3 class="card-title">Unstake & Claim</h3>
+                    <p class="cooldown-info">Staked tokens can be unstaked after 7 days cooldown.</p>
+
+                    <div class="unstake-info-row">
+                        <div>
+                            <div class="label">Available to Unstake</div>
+                            <div id="availableUnstake" class="value">0.00 $TOD</div>
+                        </div>
+                        <div>
+                            <div class="label">Cooldown Remaining</div>
+                            <div id="cooldownTimer" class="value">7d 0h 0m</div>
+                        </div>
+                    </div>
+
+                    <div class="cooldown-indicator">
+                        Cooldown Progress:
+                        <div class="cooldown-bar"><div class="cooldown-progress"></div></div>
+                    </div>
+
+                    <div class="unstake-input-group">
+                        <input type="number" id="unstakeAmount" min="0" step="0.000001" placeholder="0.00">
+                        <button id="maxUnstakeBtn" class="btn-sm">MAX</button>
+                    </div>
+
+                    <button id="unstakeBtn" class="btn btn-danger">Unstake Tokens</button>
+                    <button id="claimRewardsBtn" class="btn btn-success">Claim Rewards</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Solana Section -->
+    <section class="info-section" id="why-solana-section" data-aos="fade-right" data-aos-offset="200">
+        <div class="info-card">
+            <h2>⚡ Why Solana? The Foundation of $TOD</h2>
+            <p>We built $TOD on Solana for reasons that are clear to any true crypto ape:</p>
+            <ul>
+                <li><strong>Blazing Fast Transactions:</strong> Solana boasts an incredible transaction speed, handling thousands per second. This means less waiting and more playing!</li>
+                <li><strong>Low Fees:</strong> Say goodbye to exorbitant gas fees. Solana's minimal transaction costs mean your $TOD goes further.</li>
+                <li><strong>Scalability:</strong> Designed for mass adoption, Solana can scale to meet the demands of a growing community and a moon-bound ecosystem.</li>
+                <li><strong>Vibrant Ecosystem:</strong> A rapidly expanding network of dApps, NFTs, and DeFi projects makes Solana a dynamic and innovative blockchain.</li>
+                <li><strong>Developer Friendly:</strong> With robust tools and a thriving developer community, Solana enables us to build and iterate rapidly, bringing you the best $TOD experience.</li>
+            </ul>
+            <p class="disclaimer">Solana's technology ensures your Truth or Dare adventures are as smooth as a fresh candlestick chart.</p>
+        </div>
+    </section>
+
+    <!-- How to Buy Section -->
+    <section class="info-section" id="how-to-buy-section" data-aos="fade-left" data-aos-offset="200">
+        <div class="info-card">
+            <h2>🚀 How to Buy $TOD 💎</h2>
+            <p>Ready to ape into $TOD? Follow these simple steps!</p>
+            <ol>
+                <li><strong>Setup a Solana Wallet:</strong> Download and install Phantom Wallet (or Solflare) browser extension. Keep your seed phrase safe!</li>
+                <li><strong>Fund Your Wallet:</strong> Send SOL to your new Solana wallet from a centralized exchange (e.g., Binance, Coinbase).</li>
+                <li><strong>Visit a DEX:
+                    <a href="https://raydium.io/swap/" target="_blank" rel="noopener noreferrer">Raydium.io</a> (or Jupiter Aggregator).
+                </li>
+                <li><strong>Swap SOL for $TOD:</strong> Connect your wallet, paste the official $TOD contract address into the swap interface, and swap your SOL for $TOD.</li>
+                <li><strong>HODL & Play!:</strong> Welcome to the Truth or Dare community!</li>
+            </ol>
+            <p class="disclaimer">Always double-check contract addresses. We are not financial advisors; DYOR.</p>
+        </div>
+    </section>
+
+    <!-- Tokenomics Section -->
+    <section class="info-section" id="tokenomics-section" data-aos="fade-right" data-aos-offset="200">
+        <div class="info-card">
+            <h2>📊 $TOD Tokenomics</h2>
+            <ul>
+                <li><strong>Total Supply:</strong> 1,000,000,000 $TOD</li>
+            </ul>
+            <p><strong>Tax Structure:</strong> 0% Buy / 0% Sell. Pure memecoin, no hidden fees!</p>
+        </div>
+    </section>
+
+    <!-- Staking/Farming Section with Calculator -->
+    <section class="info-section" id="staking-calc-section" data-aos="fade-up" data-aos-offset="200">
+        <div class="info-card">
+            <h2>🌱 Stake Your $TOD! (Conceptual)</h2>
+            <p>HODL your $TOD and earn passive rewards! Our conceptual staking pool offers a simple way to grow your bag.</p>
+            <div class="staking-calculator">
+                <h3>Reward Calculator</h3>
+                <label for="stakingAmount">Amount of $TOD to Stake:</label>
+                <input type="number" id="stakingAmount" min="1" value="1000" placeholder="e.g., 1000 $TOD">
+                <label for="stakingPeriod">Staking Period (Days):</label>
+                <input type="number" id="stakingPeriod" min="1" max="365" value="30" placeholder="e.g., 30 days">
+                <button id="calculateRewardsBtn" class="btn">Calculate Rewards</button>
+                <div id="estimatedRewards" class="reward-message">
+                    <p>Estimated Rewards: <span>0.00 $TOD</span></p>
+                </div>
+                <p class="disclaimer">Note: This calculator is for conceptual demonstration only. Actual APR will vary.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Roadmap Section -->
+    <section class="info-section" id="roadmap-section" data-aos="fade-up" data-aos-offset="200">
+        <div class="info-card">
+            <h2>🗺️ $TOD Roadmap: To The Moon & Beyond!</h2>
+            <div class="roadmap-item">
+                <h3>Phase 1: Launch & Engage</h3>
+                <ul>
+                    <li>Website launch with interactive Truth or Dare game.</li>
+                    <li>Community building on Telegram & X.</li>
+                    <li>Initial liquidity provision & locking.</li>
+                    <li>Marketing push & influencer partnerships.</li>
+                </ul>
+            </div>
+            <div class="roadmap-item">
+                <h3>Phase 2: Expand & Innovate</h3>
+                <ul>
+                    <li>Game V2: More truths, dares, and scoring features.</li>
+                    <li>Community contests & reward systems.</li>
+                    <li>Partnerships with Solana projects.</li>
+                    <li>NFT collection for $TOD holders (conceptual).</li>
+                </ul>
+            </div>
+            <div class="roadmap-item">
+                <h3>Phase 3: Ecosystem & Utility</h3>
+                <ul>
+                    <li>Staking mechanisms for $TOD (conceptual).</li>
+                    <li>Integration with other Web3 games or dApps.</li>
+                    <li>Potential CEX listings.</li>
+                    <li>Autonomous community governance.</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="info-section" id="faq-section" data-aos="fade-down" data-aos-offset="200">
+        <div class="info-card">
+            <h2>❓ Frequently Asked Questions</h2>
+            <details>
+                <summary>What is $TOD?</summary>
+                <p>$TOD is a community-driven memecoin on the Solana blockchain, designed for fun and engagement, centered around our "Truth or Dare" game.</p>
+            </details>
+            <details>
+                <summary>How can I participate in the game?</summary>
+                <p>Simply click "Start Game", get a truth or dare, type your response, and click "Submit". Challenge your friends!</p>
+            </details>
+            <details>
+                <summary>Is $TOD safe?</summary>
+                <p>$TOD is a memecoin, and like all cryptocurrencies, comes with inherent risks. Always do your own research (DYOR) before investing.</p>
+            </details>
+            <details>
+                <summary>Where can I find the official contract address?</summary>
+                <p>The contract address is displayed prominently on our website, just below the header. Remember to always verify it!</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- Crypto Glossary Section -->
+    <section class="info-section" id="glossary-section" data-aos="fade-right" data-aos-offset="150">
+        <div class="info-card">
+            <h2>📖 Crypto Glossary</h2>
+            <details>
+                <summary>HODL</summary>
+                <p>A misspelling of "hold" that became a rallying cry in the crypto community, meaning to hold onto your assets despite price volatility.</p>
+            </details>
+            <details>
+                <summary>FOMO</summary>
+                <p>Fear Of Missing Out. The feeling that you need to buy a certain asset because its price is rapidly increasing, and you don't want to miss potential gains.</p>
+            </details>
+            <details>
+                <summary>Degen</summary>
+                <p>Short for "degenerate," often used affectionately to describe investors who take high risks in pursuit of high rewards, particularly in DeFi or memecoins.</p>
+            </details>
+            <details>
+                <summary>DYOR</summary>
+                <p>Do Your Own Research. A critical piece of advice in crypto, encouraging investors to thoroughly investigate projects before committing funds.</p>
+            </details>
+            <details>
+                <summary>Ape In</summary>
+                <p>To invest heavily and often impulsively into a cryptocurrency project, typically a high-risk memecoin or NFT, driven by excitement and community hype.</p>
+            </details>
+            <details>
+                <summary>Wen Lambo?</summary>
+                <p>A common phrase used in crypto communities to express anticipation for a cryptocurrency's price to rise enough to afford luxury items like a Lamborghini.</p>
+            </details>
+        </div>
+    </section>
+
+    <!-- User-Submitted Truths/Dares Section -->
+    <section class="info-section" id="suggest-challenge-section" data-aos="fade-up" data-aos-offset="100">
+        <div class="info-card">
+            <h2>💡 Suggest New Challenges!</h2>
+            <p>Got a wild crypto truth or an epic dare in mind? Submit your ideas to the $TOD community!</p>
+            <textarea id="challengeSuggestionTextarea" placeholder="Type your truth or dare suggestion here..." maxlength="1000"></textarea>
+            <button id="submitSuggestionBtn" class="btn" disabled>Submit Suggestion 📮</button>
+            <p id="suggestionThanks" class="hidden reward-message">Thanks for your awesome suggestion! The $TOD community will review it.</p>
+
+            <div class="submitted-suggestions-list">
+                <h3>Pending Suggestions (Client-Side)</h3>
+                <ul id="pendingSuggestions">
+                    <!-- Suggestions will be loaded here by JS -->
+                    <li>No suggestions yet. Be the first!</li>
+                </ul>
+                <button id="clearSuggestionsBtn" class="btn clear-btn">Clear Suggestions</button>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="social-links">
+            <a href="https://t.me/your_tod_telegram" target="_blank" rel="noopener noreferrer" class="social-icon">
+                <img src="https://img.icons8.com/?size=100&id=k4jADXhS5U1t&format=png&color=000000" alt="Telegram" class="social-logo">
+            </a>
+            <a href="https://x.com/your_tod_twitter" target="_blank" rel="noopener noreferrer" class="social-icon">
+                <img src="https://img.icons8.com/?size=100&id=oaaSr6h7kwm6&format=png&color=000000" alt="X (Twitter)" class="social-logo">
+            </a>
+        </div>
+        <p>&copy; 2025 Powered by $TOD Coin Team!</p>
+    </footer>
+
+    <!-- Sound Effects -->
+    <audio id="coinFlipSound" src="path/to/your/coin-flip-sound.mp3" preload="auto"></audio>
+    <audio id="clickSound" src="https://www.soundjay.com/buttons/beep-07.mp3" preload="auto"></audio>
+    <audio id="successSound" src="https://www.soundjay.com/misc/success-sound-effect.mp3" preload="auto"></audio>
+    <audio id="newPromptSound" src="https://www.soundjay.com/misc/menu-selection-4.mp3" preload="auto"></audio>
+    <audio id="typewriterSound" src="https://www.soundjay.com/mechanical/typewriter-1.mp3" preload="auto" loop></audio>
+    <audio id="toggleSound" src="https://www.soundjay.com/buttons/button-1.mp3" preload="auto"></audio>
+    <audio id="achievementSound" src="https://www.soundjay.com/misc/whoosh-1.mp3" preload="auto"></audio>
+
+    <!-- NEW: YouTube Background Player Container (invisible) -->
+    <audio id="youtubePlayerContainer" style="position: absolute; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none;"></audio>
+        <audio id="youtubeBackgroundPlayer"></audio>
+    </div>
+
+
+    <!-- Animate On Scroll (AOS) Library JS -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
