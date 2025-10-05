@@ -2381,4 +2381,28 @@ body.light-theme .footer a:hover {
         font-size: 1.2em;
         padding: 8px 15px;
     }
+    /* Add this to your style.css */
+    .game-notification {
+    padding: 10px;
+    margin: 15px auto; /* Center it horizontally */
+    border-radius: 5px;
+    font-size: 0.95em;
+    font-weight: bold;
+    text-align: center;
+    max-width: 90%; /* Adjust as needed */
+    width: fit-content;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .game-notification.error {
+    background-color: #fcebeb; /* Light red */
+    color: #cc0000; /* Dark red */
+    border: 1px solid #cc0000;
+    }
+
+    .game-notification.success {
+    background-color: #e6ffe6; /* Light green */
+    color: #008000; /* Dark green */
+    border: 1px solid #008000;
+    }
 }
