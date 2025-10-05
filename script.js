@@ -156,6 +156,7 @@ const savePlayerNameBtn = document.getElementById('savePlayerNameBtn');
 const currentPlayerNameDisplay = document.getElementById('currentPlayerName');
 const leaderboardList = document.getElementById('leaderboardList');
 const clearLeaderboardBtn = document.getElementById('clearLeaderboardBtn');
+const gameNotification = document.getElementById('gameNotification');
 
 // Category Selector
 const promptCategorySelector = document.getElementById('promptCategory');
@@ -308,6 +309,23 @@ function showToast(message, type = 'info', duration = 3000) {
     setTimeout(() => {
         rewardMessage.classList.add('hidden');
     }, duration);
+}
+
+function showGameNotification(message, type = 'error', duration = 5000) { // type can be 'error' or 'success'
+    if (gameNotification) {
+        gameNotification.textContent = message;
+        gameNotification.className = 'game-notification'; // Reset classes to remove previous types
+        gameNotification.classList.add(type); // Add specific type class ('error' or 'success')
+        gameNotification.style.display = 'block';
+
+        // Hide the notification automatically after a few seconds
+        setTimeout(() => {
+            gameNotification.style.display = 'none';
+        }, duration);
+    } else {
+        console.warn("gameNotification element not found. Falling back to alert:", message);
+        alert(message); // Fallback to alert if the HTML element is somehow missing
+    }
 }
 
 // Coin particle animation
@@ -550,30 +568,59 @@ function connectWallet() {
 // --- Player Name & Leaderboard Functions ---
 function loadPlayerName() {
     const storedName = localStorage.getItem('playerName');
-    if (storedName) {
-        playerName = storedName;
+    // Check if a non-empty, non-default name is stored
+    if (storedName && storedName.trim() !== "" && storedName !== "Anon Ape") {
+        playerName = storedName; // Set the global playerName variable
         if (currentPlayerNameDisplay) {
             currentPlayerNameDisplay.textContent = `Playing as: ${playerName}`;
-            currentPlayerNameDisplay.classList.remove('hidden');
+            currentPlayerNameDisplay.classList.remove('hidden'); // Show the saved name
         }
-        if (playerNameInputContainer) playerNameInputContainer.classList.add('hidden');
+        if (playerNameInputContainer) playerNameInputContainer.classList.add('hidden'); // Hide the input field
+        // If a valid name is loaded, enable the "Start Game!" button
+        if (startNextBtn) startNextBtn.disabled = false;
     } else {
+        // If no valid name is found, show the input, hide the display, disable game start
         if (playerNameInputContainer) playerNameInputContainer.classList.remove('hidden');
         if (currentPlayerNameDisplay) currentPlayerNameDisplay.classList.add('hidden');
+        if (startNextBtn) startNextBtn.disabled = true; // Ensure "Start Game!" button is disabled
+        if (playerNameInput) {
+            playerNameInput.value = ''; // Clear any stale input value
+            playerNameInput.disabled = false; // Ensure the input field is editable
+        }
+        if (savePlayerNameBtn) {
+            // Disable save button initially if input is empty
+            savePlayerNameBtn.disabled = (playerNameInput ? playerNameInput.value.trim().length === 0 : true);
+        }
+        playerName = "Anon Ape"; // Reset the global internal player name to default
     }
 }
 
 function savePlayerName() {
-    if (!playerNameInput) return;
+    if (!playerNameInput || !savePlayerNameBtn) return;
     const name = playerNameInput.value.trim();
     if (name) {
-        playerName = name;
+        playerName = name; // Update the global playerName variable
         localStorage.setItem('playerName', playerName);
-        loadPlayerName();
+
+        // Update UI immediately to reflect saving
+        if (currentPlayerNameDisplay) {
+            currentPlayerNameDisplay.textContent = `Playing as: ${playerName}`;
+            currentPlayerNameDisplay.classList.remove('hidden');
+        }
+        if (playerNameInputContainer) playerNameInputContainer.classList.add('hidden'); // Hide the input section
+
+        showGameNotification(`"${playerName}" saved! You're ready to play!`, 'success');
+
+        // Once name is saved, enable the "Start Game!" button and disable name input/save button
+        if (startNextBtn) startNextBtn.disabled = false;
+        if (playerNameInput) playerNameInput.disabled = true;
+        savePlayerNameBtn.disabled = true; // Disable the save button after successful save
+
         playSound(clickSound, sfxVolume);
         checkAchievements();
     } else {
-        alert("Please enter a name, Ape!");
+        showGameNotification("Please enter a name, Ape!", 'error'); // Use new notification
+        playSound(clickSound, sfxVolume);
     }
 }
 
@@ -1042,7 +1089,7 @@ function applySeasonalTheme() {
 function initializeGameUI() {
     if(promptDisplay) promptDisplay.textContent = 'Click "Start Game" to begin your crypto adventure!';
     if(startNextBtn) startNextBtn.textContent = 'Start Game!';
-    if(startNextBtn) startNextBtn.disabled = false;
+    if(startNextBtn) startNextBtn.disabled = true;
     if(skipBtn) skipBtn.classList.add('hidden');
 
     if(answerInputContainer) answerInputContainer.classList.add('hidden');
@@ -1100,11 +1147,19 @@ function resetGameUIForNewPrompt() {
 
 // --- Core Game Logic Functions ---
 function generatePrompt(randomCategory = false) {
-    if (!playerName || playerName.trim() === "") {
-        alert("Please enter your Ape Name before starting the game!");
-        if(playerNameInputContainer) playerNameInputContainer.classList.remove('hidden');
-        if(currentPlayerNameDisplay) currentPlayerNameDisplay.classList.add('hidden');
-        return;
+    if (!playerName || playerName.trim() === "" || playerName === "Anon Ape") {
+        showGameNotification("Please save your Ape Name first before starting the game!", 'error');
+        if (playerNameInput) {
+            playerNameInput.disabled = false; // Make sure input is editable
+            playerNameInput.focus(); // Give focus to the input for user convenience
+        }
+        if (savePlayerNameBtn) {
+            // Enable save button only if there's text, otherwise leave disabled if input is empty
+            savePlayerNameBtn.disabled = (playerNameInput ? playerNameInput.value.trim().length === 0 : true);
+        }
+        if (startNextBtn) startNextBtn.disabled = true; // Keep "Start Game!" button disabled
+
+        return; // Stop the game from generating a prompt
     }
 
     playSound(newPromptSound, sfxVolume);
@@ -1512,6 +1567,28 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
+
+        // NEW: Add an input listener to `playerNameInput`
+    // This listener dynamically enables/disables the 'Save Name' button and handles name changes
+    if (playerNameInput && savePlayerNameBtn) {
+        playerNameInput.addEventListener('input', () => {
+            // Disable save button if input is empty, enable otherwise
+            savePlayerNameBtn.disabled = playerNameInput.value.trim().length === 0;
+
+            // If the user types in the input field while a name is already displayed,
+            // it indicates they want to change their name.
+            if (currentPlayerNameDisplay && !currentPlayerNameDisplay.classList.contains('hidden')) {
+                 currentPlayerNameDisplay.classList.add('hidden'); // Hide the displayed name
+                 if (playerNameInputContainer) playerNameInputContainer.classList.remove('hidden'); // Show input section
+                 if (startNextBtn) startNextBtn.disabled = true; // Disable "Start Game!" until new name is saved
+            }
+        });
+    }
+
+    // --- Initial Setup on Page Load ---
+    initializeGameUI();
+    loadTheme();
+    // ... rest of initial setup ...
 
     // --- Initial Setup on Page Load ---
     initializeGameUI();
